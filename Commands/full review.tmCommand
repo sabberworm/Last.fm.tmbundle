@@ -79,6 +79,9 @@ class Album
 	
 	def avg_rating
 		sorted_tracks = @tracks.sort
+		sorted_tracks.delete_if do |track|
+			track.rating == 0
+		end
 		# remove the top and bottom 25% (each) of tracks to get a more median rating
 		to_remove = (sorted_tracks.length * 0.25).to_i
 		to_remove.downto(1) do ||
@@ -87,7 +90,7 @@ class Album
 		end
 		return sorted_tracks.inject(0) do |sum, track|
 			sum + track.rating
-		end.to_f / sorted_tracks.size
+		end.to_f / (sorted_tracks.size..1).max
 	end
 
 	def readable_rating
