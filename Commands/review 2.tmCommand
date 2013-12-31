@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>changed</key>
+	<dict>
+		<key>command</key>
+		<string>#!/usr/bin/env ruby1.9
+# encoding: UTF-8
+
+require "appscript"
+include Appscript
+
+rating = ENV['TM_CURRENT_LINE'].to_f
+half = rating%1 == 0.5
+
+it = app("iTunes")
+
+is_first = true
+it.selection.get.each do |track|
+	if is_first then
+		puts "[h2][artist]#{track.artist.get}[/artist] – [album artist=#{track.artist.get}]#{track.album.get}[/album][/h2]"
+		puts
+		puts "${0:text}"
+		puts
+		puts "[b]Rating:[/b] "+("★"*rating)+(half ? '½' : '')+("☆"*(5-rating))
+		puts "[b]Best tracks[/b]"
+		print "[ulist]"
+		is_first = false
+	end
+	print "[li][track artist=#{track.artist.get}]#{track.name.get}[/track][/li]"
+end
+puts "[/ulist]"
+</string>
+		<key>inputFormat</key>
+		<string>text</string>
+		<key>outputCaret</key>
+		<string>afterOutput</string>
+		<key>outputFormat</key>
+		<string>snippet</string>
+		<key>outputLocation</key>
+		<string>atCaret</string>
+		<key>version</key>
+		<integer>2</integer>
+	</dict>
+	<key>deleted</key>
+	<array>
+		<string>output</string>
+		<string>uuid</string>
+	</array>
+	<key>isDelta</key>
+	<true/>
+	<key>uuid</key>
+	<string>A211E420-EE54-4933-83BB-49AE2B5B3FC8</string>
+</dict>
+</plist>

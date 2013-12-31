@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>name</key>
+	<string>Last.fm</string>
+	<key>ordering</key>
+	<array>
+		<string>132B8F46-7A1C-43E7-894A-355CE476F2D6</string>
+		<string>A211E420-EE54-4933-83BB-49AE2B5B3FC8</string>
+		<string>109DB29A-EF70-459C-BF86-1756CDD469A3</string>
+		<string>C9226865-6D73-4C70-9D1B-CD15233662BB</string>
+		<string>045874B1-D318-48BD-B7C6-466ECB62898E</string>
+		<string>4B6D2331-A4B2-4DE6-A763-7A8A0C68481D</string>
+	</array>
+	<key>uuid</key>
+	<string>0FA0402A-CA50-4243-856C-AD974C2D55F1</string>
+</dict>
+</plist>

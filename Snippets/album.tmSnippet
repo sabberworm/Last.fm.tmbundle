@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>[album artist=$1]${TM_SELECTED_TEXT}$2[/album]</string>
+	<key>keyEquivalent</key>
+	<string>^A</string>
+	<key>name</key>
+	<string>album</string>
+	<key>scope</key>
+	<string>text.bbcode.lastfm</string>
+	<key>tabTrigger</key>
+	<string></string>
+	<key>uuid</key>
+	<string>C9226865-6D73-4C70-9D1B-CD15233662BB</string>
+</dict>
+</plist>

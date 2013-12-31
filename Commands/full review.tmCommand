@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>autoScrollOutput</key>
+	<false/>
+	<key>beforeRunningCommand</key>
+	<string>nop</string>
+	<key>command</key>
+	<string>#!/usr/bin/env ruby1.9
+# encoding: UTF-8
+
+require "appscript"
+require "set"
+include Appscript
+
+def format_rating(rating)
+	stars = rating/20
+	half = rating%20 == 10
+	return ("★"*stars)+(half ? '½' : '')+("☆"*(5-(stars + (half ? 1 : 0))))
+end
+
+class Track
+	attr_accessor :album, :name, :rating, :skip_count, :play_count
+	
+	def initialize(name, rating, skip_count, play_count, track_artist = nil)
+		@name = name
+		@rating = rating
+		@skip_count = skip_count
+		@play_count = play_count
+		@track_artist = track_artist
+	end
+	
+	def sort_value
+		# |r|xxx|yyy (r = rating/10, xxx = 1000 - skip count, yyy = play count)
+		return @rating * 100000 + (1000 - @skip_count) * 1000 + @play_count
+	end
+	
+	def &lt;=&gt;(other)
+		# sort descending by default
+		return other.sort_value &lt;=&gt; self.sort_value
+	end
+	
+	def readable_rating
+		format_rating(@rating)
+	end
+	
+	def artist
+		@track_artist.nil? ? @album.artist : @track_artist
+	end
+	
+	def to_s
+		return "#{self.artist} – #{@name} (#{@album.name}) [#{self.readable_rating}]"
+	end
+end
+
+class Album
+	attr_accessor :artist, :name
+	
+	def initialize(artist, name)
+		@artist = artist
+		@name = name
+		@tracks = []
+	end
+	
+	def &lt;&lt;(track)
+		track.album = self
+		@tracks.push(track)
+	end
+	
+	def avg_rating
+		sorted_tracks = @tracks.sort
+		# remove the top and bottom 25% (each) of tracks to get a more median rating
+		to_remove = (sorted_tracks.length * 0.25).to_i
+		to_remove.downto(1) do ||
+			sorted_tracks.shift
+			sorted_tracks.pop
+		end
+		return sorted_tracks.inject(0) do |sum, track|
+			sum + track.rating
+		end.to_f / sorted_tracks.size
+	end
+
+	def readable_avg_rating
+		format_rating((self.avg_rating/10).round * 10)
+	end
+	
+	def top_tracks
+		# Rules:
+		# All tracks rated 90 or more must be included
+		# If less than four tracks, add up to four, rated at least 60 (order by rating asc, skip count desc, play count asc)
+		# If no tracks included, add the top track
+		sorted_tracks = @tracks.sort
+		result = []
+		while sorted_tracks.first.rating &gt;= 90
+			result &lt;&lt; sorted_tracks.shift
+		end
+		while result.length &lt; 4 and sorted_tracks.length &gt; 0 and sorted_tracks.first.rating &gt; 60
+			result &lt;&lt; sorted_tracks.shift
+		end
+		if result.length == 0 then
+			result &lt;&lt; sorted_tracks.shift
+		end
+		result
+	end
+	
+	def tracks
+		return @tracks.clone.freeze
+	end
+	
+	def eql?(album)
+		return false unless album.instance_of?(Album)
+		return (self.artist == album.artist and self.name == album.name)
+	end
+	
+	def hash
+		return self.artist.hash + self.name.hash
+	end
+
+	def to_s
+		return "#{@artist} – #{@name}"
+	end
+end
+
+albums = {}
+
+rating = ENV['TM_CURRENT_LINE'].to_f
+
+it = app("iTunes")
+pl = it.current_playlist.get
+
+pl.file_tracks.get.each do |t|
+	compilation = t.compilation.get
+	artist = compilation ? "Various Artists" : t.artist.get
+	album = Album.new(artist, t.album.get)
+	if albums.has_key? album.hash then
+		album = albums[album.hash]
+	else
+		albums[album.hash] = album
+	end
+	track = Track.new(t.name.get, t.rating.get, t.skipped_count.get, t.played_count.get, compilation ? t.artist.get : nil)
+	album &lt;&lt; track
+end
+
+albums = albums.values.shuffle
+
+puts "[h1]#{pl.name.get}[/h1]"
+puts
+puts
+
+albums.each_index do |key|
+	album = albums[key]
+	puts "[h2][artist]#{album.artist}[/artist] – [album artist=#{album.artist}]#{album.name}[/album][/h2]"
+	puts
+	puts "${#{(key+1)*2}:#{album}}"
+	puts
+	puts "[b]Rating:[/b] ${#{(key+1)*2+1}:#{album.readable_avg_rating}}"
+	puts "[b]Best tracks[/b]"
+	print "[ulist]"
+	album.top_tracks.each do |track|
+		print "[li][track artist=#{track.artist}]#{track.name}[/track][/li]"
+	end
+	puts "[/ulist]"
+	puts
+end
+
+</string>
+	<key>input</key>
+	<string>none</string>
+	<key>inputFormat</key>
+	<string>text</string>
+	<key>keyEquivalent</key>
+	<string>^R</string>
+	<key>name</key>
+	<string>full review</string>
+	<key>outputCaret</key>
+	<string>afterOutput</string>
+	<key>outputFormat</key>
+	<string>snippet</string>
+	<key>outputLocation</key>
+	<string>atCaret</string>
+	<key>scope</key>
+	<string>text.bbcode</string>
+	<key>uuid</key>
+	<string>03EFCB61-6346-4BDA-BA42-90400AF5974D</string>
+	<key>version</key>
+	<integer>2</integer>
+</dict>
+</plist>

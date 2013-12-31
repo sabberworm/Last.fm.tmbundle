@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>lfm</string>
+	</array>
+	<key>foldingStartMarker</key>
+	<string>\[[^/][^\]]+\]</string>
+	<key>foldingStopMarker</key>
+	<string>\[/[^/\]]+\]</string>
+	<key>keyEquivalent</key>
+	<string>^~L</string>
+	<key>name</key>
+	<string>Last.fm BBCode</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>include</key>
+			<string>text.bbcode</string>
+		</dict>
+	</array>
+	<key>scopeName</key>
+	<string>text.bbcode.lastfm</string>
+	<key>uuid</key>
+	<string>132B8F46-7A1C-43E7-894A-355CE476F2D6</string>
+</dict>
+</plist>
