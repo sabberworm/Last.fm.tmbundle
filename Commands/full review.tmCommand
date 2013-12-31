@@ -57,15 +57,24 @@ end
 class Album
 	attr_accessor :artist, :name
 	
-	def initialize(artist, name)
+	def initialize(artist, name, album_rating = nil)
 		@artist = artist
 		@name = name
 		@tracks = []
+		@album_rating = album_rating
 	end
 	
 	def &lt;&lt;(track)
 		track.album = self
 		@tracks.push(track)
+	end
+	
+	def rating
+		if @album_rating.nil? then
+			return self.avg_rating
+		else
+			return @album_rating
+		end
 	end
 	
 	def avg_rating
@@ -81,8 +90,8 @@ class Album
 		end.to_f / sorted_tracks.size
 	end
 
-	def readable_avg_rating
-		format_rating((self.avg_rating/10).round * 10)
+	def readable_rating
+		format_rating((self.rating/10).round * 10)
 	end
 	
 	def top_tracks
@@ -130,9 +139,10 @@ it = app("iTunes")
 pl = it.current_playlist.get
 
 pl.file_tracks.get.each do |t|
+	rating = t.album_rating_kind.get == :computed ? nil : t.album_rating.get
 	compilation = t.compilation.get
 	artist = compilation ? "Various Artists" : t.artist.get
-	album = Album.new(artist, t.album.get)
+	album = Album.new(artist, t.album.get, rating)
 	if albums.has_key? album.hash then
 		album = albums[album.hash]
 	else
@@ -154,7 +164,7 @@ albums.each_index do |key|
 	puts
 	puts "${#{(key+1)*2}:#{album}}"
 	puts
-	puts "[b]Rating:[/b] ${#{(key+1)*2+1}:#{album.readable_avg_rating}}"
+	puts "[b]Rating:[/b] ${#{(key+1)*2+1}:#{album.readable_rating}}"
 	puts "[b]Best tracks[/b]"
 	print "[ulist]"
 	album.top_tracks.each do |track|
