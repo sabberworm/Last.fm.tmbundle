@@ -99,15 +99,15 @@ class Album
 	
 	def top_tracks
 		# Rules:
-		# All tracks rated 90 or more must be included
-		# If less than four tracks, add up to four, rated at least 60 (order by rating asc, skip count desc, play count asc)
+		# All tracks rated 90 or more (4½+) must be included
+		# If less than four tracks, add up to four, rated at least 70 (3½+) (order by rating asc, skip count desc, play count asc)
 		# If no tracks included, add the top track
 		sorted_tracks = @tracks.sort
 		result = []
 		while sorted_tracks.first.rating &gt;= 90
 			result &lt;&lt; sorted_tracks.shift
 		end
-		while result.length &lt; 4 and sorted_tracks.length &gt; 0 and sorted_tracks.first.rating &gt; 60
+		while result.length &lt; 4 and sorted_tracks.length &gt; 0 and sorted_tracks.first.rating &gt;= 70
 			result &lt;&lt; sorted_tracks.shift
 		end
 		if result.length == 0 then
@@ -144,14 +144,18 @@ pl = it.current_playlist.get
 pl.file_tracks.get.each do |t|
 	rating = t.album_rating_kind.get == :computed ? nil : t.album_rating.get
 	compilation = t.compilation.get
-	artist = compilation ? "Various Artists" : t.artist.get
+	artist = compilation ? "Various Artists" : t.album_artist.get
+	if artist == "" then
+		artist = t.artist.get
+	end
 	album = Album.new(artist, t.album.get, rating)
 	if albums.has_key? album.hash then
 		album = albums[album.hash]
 	else
 		albums[album.hash] = album
 	end
-	track = Track.new(t.name.get, t.rating.get, t.skipped_count.get, t.played_count.get, compilation ? t.artist.get : nil)
+	rating = t.rating_kind.get == :computed ? 0 : t.rating.get
+	track = Track.new(t.name.get, rating, t.skipped_count.get, t.played_count.get, t.artist.get)
 	album &lt;&lt; track
 end
 
@@ -165,7 +169,7 @@ albums.each_index do |key|
 	album = albums[key]
 	puts "[h2][artist]#{album.artist}[/artist] – [album artist=#{album.artist}]#{album.name}[/album][/h2]"
 	puts
-	puts "${#{(key+1)*2}:#{album}}"
+	puts "${#{(key+1)*2}:write about #{album}}"
 	puts
 	puts "[b]Rating:[/b] ${#{(key+1)*2+1}:#{album.readable_rating}}"
 	puts "[b]Best tracks[/b]"
