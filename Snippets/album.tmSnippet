@@ -5,7 +5,7 @@
 	<key>content</key>
 	<string>[album artist=$1]${TM_SELECTED_TEXT:$2}[/album]$3</string>
 	<key>keyEquivalent</key>
-	<string>^A</string>
+	<string>^l</string>
 	<key>name</key>
 	<string>album</string>
 	<key>scope</key>
