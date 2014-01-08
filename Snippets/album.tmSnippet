@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>content</key>
-	<string>[album artist=$1]${TM_SELECTED_TEXT}$2[/album]</string>
+	<string>[album artist=$1]${TM_SELECTED_TEXT:$2}[/album]$3</string>
 	<key>keyEquivalent</key>
 	<string>^A</string>
 	<key>name</key>
